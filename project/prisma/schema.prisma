@@ -14,27 +14,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// file: prisma/schema.prisma
+
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  stripeCustomerId String? // ID do cliente no Stripe
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               String    @id @default(uuid())
+  name             String
+  email            String    @unique
+  password         String
+  stripeCustomerId String?
+
+  // --- CAMPOS NOVOS E NECESSÁRIOS ---
+  cpf_cnpj         String?   @unique // NOVO! Para armazenar o CPF ou CNPJ.
+  phone            String?   // NOVO! Telefone do usuário.
+  street           String?   // NOVO! Rua, número e complemento.
+  city             String?   // NOVO! Cidade.
+  state            String?   // NOVO! Sigla do estado (ex: BA, SP).
+  postal_code      String?   // NOVO! CEP.
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   transactions Transaction[]
 }
 
 model Transaction {
-  id             String   @id @default(uuid())
-  userId         String
-  amount         Decimal  @db.Decimal(10, 2) // Valor da transação
-  currency       String   @default("BRL")
-  status         TransactionStatus @default(PENDING)
-  stripePaymentId String? // ID do pagamento no Stripe
-  description    String?
-  createdAt      DateTime @default(now())
+  id              String            @id @default(uuid())
+  userId          String
+  amount          Decimal           @db.Decimal(10, 2)
+  currency        String            @default("BRL")
+  status          TransactionStatus @default(PENDING)
+  stripePaymentId String?           @unique // Mudei para @unique, é uma boa prática.
+  description     String?
+  createdAt       DateTime          @default(now())
+
+  // --- MELHORIAS OPCIONAIS PARA UX ---
+  boletoUrl       String?           // NOVO! Para salvar o link do PDF do boleto.
+  boletoLine      String?           // NOVO! Para salvar a linha digitável.
 
   user User @relation(fields: [userId], references: [id])
 }

@@ -1,11 +1,29 @@
 /* eslint-disable prettier/prettier */
-import { TransactionStatus } from "generated/prisma/client";
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { IsString, IsNumber, Min, IsOptional, IsEnum } from 'class-validator';
+import { TransactionStatus } from 'generated/prisma/client';
 
-export interface CreateTransactionDto {
+export class CreateTransactionDto {
+  @IsString()
   userId: string;
-  amount: number; // ou string se quiser lidar com Decimal
+
+  @IsNumber()
+  @Min(1)
+  amount: number;
+
+  @IsOptional()
+  @IsString()
   currency?: string;
+
+  @IsOptional()
+  @IsEnum(TransactionStatus)
   status?: TransactionStatus;
+
+  @IsOptional()
+  @IsString()
   stripePaymentId?: string;
+
+  @IsOptional()
+  @IsString()
   description?: string;
 }
